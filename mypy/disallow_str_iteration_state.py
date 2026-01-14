@@ -23,7 +23,7 @@ class DisallowStrIterationState:
             self.disallow_str_iteration = saved
 
 
-disallow_str_iteration_state: Final = DisallowStrIterationState(disallow_str_iteration=False)
+disallow_str_iteration_state: Final = DisallowStrIterationState(disallow_str_iteration=True)
 
 
 STR_ITERATION_PROTOCOL_BASES: Final = frozenset(

@@ -520,7 +520,7 @@ class TypeChecker(NodeVisitor[None], TypeCheckerSharedApi):
         self.recurse_into_functions = True
         with (
             state.strict_optional_set(self.options.strict_optional),
-            disallow_str_iteration_state.set(self.options.disallow_str_iteration),
+            disallow_str_iteration_state.set(True),
             checker_state.set(self),
         ):
             self.errors.set_file(
@@ -569,7 +569,7 @@ class TypeChecker(NodeVisitor[None], TypeCheckerSharedApi):
         self.recurse_into_functions = True
         with (
             state.strict_optional_set(self.options.strict_optional),
-            disallow_str_iteration_state.set(self.options.disallow_str_iteration),
+            disallow_str_iteration_state.set(True),
             checker_state.set(self),
         ):
             if not todo and not self.deferred_nodes:

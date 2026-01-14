@@ -240,7 +240,7 @@ class Options:
         self.strict_bytes = False
 
         # Disallow iterating over str instances or using them as Sequence[T]
-        self.disallow_str_iteration = False
+        self.disallow_str_iteration = True
 
         # Deprecated, use extra_checks instead.
         self.strict_concatenate = False
