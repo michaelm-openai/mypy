@@ -34,6 +34,10 @@ from mypy.nodes import (
     Var,
 )
 from mypy.options import Options
+from mypy.disallow_str_iteration_state import (
+    disallow_str_iteration_state,
+    is_subtype_relation_ignored_to_disallow_str_iteration,
+)
 from mypy.state import state
 from mypy.types import (
     MYPYC_NATIVE_INT_NAMES,
@@ -479,6 +483,13 @@ class SubtypeVisitor(TypeVisitor[bool]):
             # dynamic base classes correctly, see #5456.
             return not isinstance(self.right, NoneType)
         right = self.right
+
+        if (
+            disallow_str_iteration_state.disallow_str_iteration
+            and isinstance(right, Instance)
+            and is_subtype_relation_ignored_to_disallow_str_iteration(left, right)
+        ):
+            return False
         if isinstance(right, TupleType) and right.partial_fallback.type.is_enum:
             return self._is_subtype(left, mypy.typeops.tuple_fallback(right))
         if isinstance(right, TupleType):
@@ -1192,6 +1203,11 @@ def is_protocol_implementation(
     as well.
     """
     assert right.type.is_protocol
+    if (
+        disallow_str_iteration_state.disallow_str_iteration
+        and is_subtype_relation_ignored_to_disallow_str_iteration(left, right)
+    ):
+        return False
     if skip is None:
         skip = []
     # We need to record this check to generate protocol fine-grained dependencies.
