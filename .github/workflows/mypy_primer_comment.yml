@@ -6,6 +6,7 @@ on:  # zizmor: ignore[dangerous-triggers]
       - Run mypy_primer
     types:
       - completed
+  workflow_dispatch:
 
 permissions: {}
 
@@ -16,7 +17,6 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Download diffs
         uses: actions/github-script@v7
@@ -26,7 +26,7 @@ jobs:
             const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
                owner: context.repo.owner,
                repo: context.repo.repo,
-               run_id: ${{ github.event.workflow_run.id }},
+               run_id: 21130698498,
             });
             const [matchArtifact] = artifacts.data.artifacts.filter((artifact) =>
               artifact.name == "mypy_primer_diffs");
@@ -66,9 +66,26 @@ jobs:
               return `${truncated}\n\n... (truncated ${lines_truncated} lines) ...`
             }
 
+            data = data.split('\n').filter(line => !(
+              line.includes(': note: ') ||
+              line.includes('has incompatible type "str"') ||
+              line.includes('Iterating over ') ||
+              line.includes('not iterable') ||
+              line.includes('Expected iterable ') ||
+              line.includes('This is because --disallow-str-iteration is enabled') ||
+              line.includes('Unpacking a string is disallowed') ||
+              line.includes('incompatible') ||
+              line.includes('Incompatible') ||
+              line.includes('At top level:') ||
+              line.includes('In function ') ||
+              line.includes('In member "') ||
+              line.includes('No overload variant') ||
+              line.includes('Unsupported operand types') ||
+              line.includes('type: ignore')
+            )).join('\n');
             const projects = data.split('\n\n')
             // don't let one project dominate
-            data = projects.map(project => truncateIfNeeded(project, MAX_CHARACTERS_PER_PROJECT)).join('\n\n')
+            data = projects.filter(project => project.trim().includes('\n')).map(project => truncateIfNeeded(project, MAX_CHARACTERS_PER_PROJECT)).join('\n\n')
             // posting comment fails if too long, so truncate
             data = truncateIfNeeded(data, MAX_CHARACTERS)
 
